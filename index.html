@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sammlungen per Formular</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f3f5f7;
+      color: #222;
+    }
+
+    .wrap {
+      max-width: 1100px;
+      margin: 24px auto;
+      padding: 16px;
+    }
+
+    h1 {
+      margin: 0 0 18px;
+      font-size: 28px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+      padding: 18px;
+      margin-bottom: 18px;
+    }
+
+    h2 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      font-size: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    input, textarea {
+      width: 100%;
+      border: 1px solid #ccd4dc;
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .grid-1 {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .btn-primary {
+      background: #0078d4;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #005ea6;
+    }
+
+    .btn-secondary {
+      background: #e7ecf1;
+      color: #222;
+    }
+
+    .btn-secondary:hover {
+      background: #d9e1e8;
+    }
+
+    .btn-send {
+      background: #107c10;
+      color: #fff;
+    }
+
+    .btn-send:hover {
+      background: #0b5d0b;
+    }
+
+    .btn-danger {
+      background: #d13438;
+      color: #fff;
+    }
+
+    .btn-danger:hover {
+      background: #a4262c;
+    }
+
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .entry {
+      border: 1px solid #dde4ea;
+      border-radius: 12px;
+      padding: 14px;
+      background: #fbfcfd;
+      margin-bottom: 12px;
+    }
+
+    .entry-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: start;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+
+    .entry-title {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 4px;
+    }
+
+    .meta {
+      font-size: 12px;
+      color: #666;
+      line-height: 1.5;
+    }
+
+    .content-box {
+      white-space: pre-wrap;
+      background: #fff;
+      border: 1px solid #e3e8ee;
+      border-radius: 10px;
+      padding: 12px;
+      margin: 10px 0 12px;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+    }
+
+    .empty {
+      color: #666;
+      font-style: italic;
+      padding: 8px 0;
+    }
+
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #0b5d0b;
+      font-weight: bold;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e8f2fc;
+      color: #0b5cad;
+      border-radius: 999px;
+      padding: 4px 10px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 800px) {
+      .grid-2,
+      .toolbar {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Sammlungen per Formular</h1>
+
+    <div class="card">
+      <h2 id="formTitle">Neue Sammlung anlegen</h2>
+
+      <div class="grid-2">
+        <div>
+          <label for="sammlung">Sammlung / Thema</label>
+          <input type="text" id="sammlung" placeholder="z. B. Teammeeting, Rückrufe, Reklamationen" />
+        </div>
+        <div>
+          <label for="betreff">Betreff</label>
+          <input type="text" id="betreff" placeholder="z. B. Offene Punkte Teammeeting" />
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top:12px;">
+        <div>
+          <label for="empfaenger">Empfänger</label>
+          <input type="email" id="empfaenger" placeholder="z. B. max@firma.de" />
+        </div>
+        <div>
+          <label for="cc">CC (optional)</label>
+          <input type="text" id="cc" placeholder="z. B. team@firma.de" />
+        </div>
+      </div>
+
+      <div class="grid-1" style="margin-top:12px;">
+        <div>
+          <label for="inhalt">Inhalt der Sammlung</label>
+          <textarea id="inhalt" placeholder="Hier den kompletten Inhalt der Sammlung eingeben..."></textarea>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn-primary" id="saveBtn" onclick="saveEntry()">Sammlung speichern</button>
+        <button class="btn-secondary" onclick="clearForm()">Formular leeren</button>
+      </div>
+
+      <div class="small">
+        Die Einträge sind nur temporär und bleiben nur in dieser Browser-Sitzung erhalten.
+      </div>
+      <div class="status" id="status"></div>
+    </div>
+
+    <div class="card">
+      <h2>Vorhandene Sammlungen</h2>
+
+      <div class="toolbar">
+        <div>
+          <label for="search">Suche</label>
+          <input type="text" id="search" placeholder="Nach Sammlung, Betreff oder Inhalt suchen..." oninput="renderEntries()" />
+        </div>
+        <div>
+          <button class="btn-secondary" onclick="clearAll()">Alle Sammlungen löschen</button>
+        </div>
+      </div>
+
+      <div id="list" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = "sammlungen_formular_temp";
+    let entries = [];
+    let editId = null;
+
+    function uid() {
+      return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    }
+
+    function saveStorage() {
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
+    }
+
+    function loadStorage() {
+      const raw = sessionStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      try {
+        entries = JSON.parse(raw) || [];
+      } catch (e) {
+        entries = [];
+      }
+    }
+
+    function showStatus(text, color = "#0b5d0b") {
+      const el = document.getElementById("status");
+      el.textContent = text;
+      el.style.color = color;
+      setTimeout(() => {
+        if (el.textContent === text) el.textContent = "";
+      }, 2500);
+    }
+
+    function getFormData() {
+      return {
+        sammlung: document.getElementById("sammlung").value.trim(),
+        betreff: document.getElementById("betreff").value.trim(),
+        empfaenger: document.getElementById("empfaenger").value.trim(),
+        cc: document.getElementById("cc").value.trim(),
+        inhalt: document.getElementById("inhalt").value.trim()
+      };
+    }
+
+    function saveEntry() {
+      const data = getFormData();
+
+      if (!data.sammlung) {
+        alert("Bitte eine Sammlung / ein Thema eingeben.");
+        return;
+      }
+
+      if (!data.betreff) {
+        alert("Bitte einen Betreff eingeben.");
+        return;
+      }
+
+      if (!data.inhalt) {
+        alert("Bitte einen Inhalt eingeben.");
+        return;
+      }
+
+      if (editId) {
+        const index = entries.findIndex(e => e.id === editId);
+        if (index !== -1) {
+          entries[index] = {
+            ...entries[index],
+            ...data,
+            updatedAt: new Date().toLocaleString("de-DE")
+          };
+          saveStorage();
+          renderEntries();
+          clearForm();
+          showStatus("Sammlung wurde aktualisiert.");
+        }
+        return;
+      }
+
+      entries.unshift({
+        id: uid(),
+        ...data,
+        createdAt: new Date().toLocaleString("de-DE"),
+        updatedAt: ""
+      });
+
+      saveStorage();
+      renderEntries();
+      clearForm();
+      showStatus("Sammlung wurde gespeichert.");
+    }
+
+    function clearForm() {
+      document.getElementById("sammlung").value = "";
+      document.getElementById("betreff").value = "";
+      document.getElementById("empfaenger").value = "";
+      document.getElementById("cc").value = "";
+      document.getElementById("inhalt").value = "";
+      editId = null;
+      document.getElementById("formTitle").textContent = "Neue Sammlung anlegen";
+      document.getElementById("saveBtn").textContent = "Sammlung speichern";
+    }
+
+    function editEntry(id) {
+      const entry = entries.find(e => e.id === id);
+      if (!entry) return;
+
+      document.getElementById("sammlung").value = entry.sammlung || "";
+      document.getElementById("betreff").value = entry.betreff || "";
+      document.getElementById("empfaenger").value = entry.empfaenger || "";
+      document.getElementById("cc").value = entry.cc || "";
+      document.getElementById("inhalt").value = entry.inhalt || "";
+
+      editId = id;
+      document.getElementById("formTitle").textContent = "Sammlung bearbeiten";
+      document.getElementById("saveBtn").textContent = "Änderungen speichern";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function deleteEntry(id) {
+      if (!confirm("Diese Sammlung wirklich löschen?")) return;
+      entries = entries.filter(e => e.id !== id);
+      saveStorage();
+      renderEntries();
+      if (editId === id) clearForm();
+      showStatus("Sammlung wurde gelöscht.", "#a4262c");
+    }
+
+    function clearAll() {
+      if (!entries.length) return;
+      if (!confirm("Wirklich alle Sammlungen löschen?")) return;
+      entries = [];
+      saveStorage();
+      renderEntries();
+      clearForm();
+      showStatus("Alle Sammlungen wurden gelöscht.", "#a4262c");
+    }
+
+    function sendEntry(id) {
+      const entry = entries.find(e => e.id === id);
+      if (!entry) return;
+
+      const to = entry.empfaenger || "";
+      const cc = entry.cc || "";
+      const subject = entry.betreff || "";
+      const body =
+        "Sammlung: " + (entry.sammlung || "") + "\n" +
+        "Erfasst am: " + (entry.createdAt || "") + "\n" +
+        (entry.updatedAt ? "Zuletzt geändert: " + entry.updatedAt + "\n" : "") +
+        "\n" +
+        (entry.inhalt || "");
+
+      let mailto = "mailto:" + encodeURIComponent(to)
+        + "?subject=" + encodeURIComponent(subject)
+        + "&body=" + encodeURIComponent(body);
+
+      if (cc) {
+        mailto += "&cc=" + encodeURIComponent(cc);
+      }
+
+      window.location.href = mailto;
+    }
+
+    function escapeHtml(str) {
+      return (str || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function renderEntries() {
+      const list = document.getElementById("list");
+      const search = document.getElementById("search").value.trim().toLowerCase();
+
+      let filtered = entries.filter(e => {
+        const text = [
+          e.sammlung,
+          e.betreff,
+          e.empfaenger,
+          e.cc,
+          e.inhalt
+        ].join(" ").toLowerCase();
+        return text.includes(search);
+      });
+
+      if (!filtered.length) {
+        list.innerHTML = '<div class="empty">Keine Sammlungen vorhanden.</div>';
+        return;
+      }
+
+      list.innerHTML = filtered.map(entry => `
+        <div class="entry">
+          <div class="entry-head">
+            <div>
+              <div class="badge">${escapeHtml(entry.sammlung)}</div>
+              <div class="entry-title">${escapeHtml(entry.betreff)}</div>
+              <div class="meta">
+                Empfänger: ${escapeHtml(entry.empfaenger || "-")}<br>
+                CC: ${escapeHtml(entry.cc || "-")}<br>
+                Erfasst: ${escapeHtml(entry.createdAt || "-")}
+                ${entry.updatedAt ? "<br>Zuletzt geändert: " + escapeHtml(entry.updatedAt) : ""}
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="btn-send" onclick="sendEntry('${entry.id}')">Separat versenden</button>
+              <button class="btn-secondary" onclick="editEntry('${entry.id}')">Bearbeiten</button>
+              <button class="btn-danger" onclick="deleteEntry('${entry.id}')">Löschen</button>
+            </div>
+          </div>
+
+          <div class="content-box">${escapeHtml(entry.inhalt)}</div>
+        </div>
+      `).join("");
+    }
+
+    loadStorage();
+    renderEntries();
+  </script>
+</body>
+</html>
