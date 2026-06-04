@@ -6,504 +6,605 @@
   </script>
   <script src="schutz.js"></script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dynamischer Tabellen- & Themen-Manager</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <style>
-        :root {
-            --primary: #0f172a;
-            --accent: #2563eb;
-            --accent-hover: #1d4ed8;
-            --bg: #f8fafc;
-            --card-bg: #ffffff;
-            --text: #334155;
-            --border: #cbd5e1;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamischer Tabellen- & Themen-Manager</title>
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            padding: 40px 20px;
-            display: flex;
-            justify-content: center;
-        }
+  <style>
+    :root {
+      --primary: #0f172a;
+      --accent: #2563eb;
+      --accent-hover: #1d4ed8;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text: #334155;
+      --border: #cbd5e1;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 1100px;
-            background: var(--card-bg);
-            padding: 40px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
-        }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
 
-        h1 {
-            color: var(--primary);
-            font-size: 1.8rem;
-            margin-bottom: 8px;
-        }
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 40px 20px;
+      display: flex;
+      justify-content: center;
+    }
 
-        .subtitle {
-            color: #64748b;
-            font-size: 0.95rem;
-            margin-bottom: 30px;
-        }
+    .container {
+      width: 100%;
+      max-width: 1100px;
+      background: var(--card-bg);
+      padding: 40px;
+      border-radius: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+    }
 
-        section {
-            margin-bottom: 35px;
-            padding: 20px;
-            background: #f1f5f9;
-            border-radius: 12px;
-        }
+    h1 {
+      color: var(--primary);
+      font-size: 1.8rem;
+      margin-bottom: 8px;
+    }
 
-        section h3 {
-            margin-bottom: 15px;
-            color: var(--primary);
-            font-size: 1.1rem;
-        }
+    .subtitle {
+      color: #64748b;
+      font-size: 0.95rem;
+      margin-bottom: 30px;
+    }
 
-        /* Spalten-Konfigurator */
-        .columns-config {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            align-items: center;
-        }
+    section {
+      margin-bottom: 35px;
+      padding: 20px;
+      background: #f1f5f9;
+      border-radius: 12px;
+    }
 
-        .column-badge {
-            background: #fff;
-            padding: 6px 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    section h3 {
+      margin-bottom: 15px;
+      color: var(--primary);
+      font-size: 1.1rem;
+    }
 
-        .column-badge input {
-            border: none;
-            font-weight: 600;
-            color: var(--text);
-            width: 110px;
-            outline: none;
-        }
+    /* Spalten-Konfigurator */
+    .columns-config {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
 
-        .btn-remove-col {
-            background: transparent;
-            color: #ef4444;
-            border: none;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    .column-badge {
+      background: #fff;
+      padding: 6px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-        /* Dynamisches Eingabeformular */
-        .dynamic-form {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 12px;
-            margin-bottom: 15px;
-        }
+    .column-badge input {
+      border: none;
+      font-weight: 600;
+      color: var(--text);
+      width: 110px;
+      outline: none;
+      background: transparent;
+    }
 
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+    .btn-remove-col {
+      background: transparent;
+      color: #ef4444;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      padding: 0;
+    }
 
-        .form-group label {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #64748b;
-        }
+    /* Dynamisches Eingabeformular */
+    .dynamic-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 12px;
+      margin-bottom: 15px;
+    }
 
-        input[type="text"] {
-            width: 100%;
-            padding: 10px 14px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            outline: none;
-            background: #fff;
-        }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
 
-        input[type="text"]:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(37, 99, 233, 0.15);
-        }
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #64748b;
+    }
 
-        /* Buttons */
-        button {
-            padding: 10px 18px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.95rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      background: #fff;
+    }
 
-        .btn-accent { background: var(--accent); color: white; }
-        .btn-accent:hover { background: var(--accent-hover); }
-        
-        .btn-secondary { background: #64748b; color: white; }
-        .btn-secondary:hover { background: #475569; }
+    input[type="text"]:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(37, 99, 233, 0.15);
+    }
 
-        .btn-excel { background: #16a34a; color: white; }
-        .btn-excel:hover { background: #15803d; }
+    /* Buttons */
+    button {
+      padding: 10px 18px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
 
-        .btn-pdf { background: #dc2626; color: white; }
-        .btn-pdf:hover { background: #b91c1c; }
+    .btn-accent {
+      background: var(--accent);
+      color: white;
+    }
+    .btn-accent:hover {
+      background: var(--accent-hover);
+    }
 
-        /* Export-Leiste */
-        .export-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
+    .btn-secondary {
+      background: #64748b;
+      color: white;
+    }
+    .btn-secondary:hover {
+      background: #475569;
+    }
 
-        /* Tabellen-Styling */
-        .table-container {
-            overflow-x: auto;
-            background: #fff;
-            border: 1px solid var(--border);
-            border-radius: 8px;
-        }
+    .btn-excel {
+      background: #16a34a;
+      color: white;
+    }
+    .btn-excel:hover {
+      background: #15803d;
+    }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-            font-size: 0.95rem;
-        }
+    .btn-pdf {
+      background: #dc2626;
+      color: white;
+    }
+    .btn-pdf:hover {
+      background: #b91c1c;
+    }
 
-        th, td {
-            padding: 12px 16px;
-            border-bottom: 1px solid var(--border);
-        }
+    /* Export-Leiste */
+    .export-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
 
-        th {
-            background: #f8fafc;
-            color: var(--primary);
-            font-weight: 700;
-        }
+    /* Tabellen-Styling */
+    .table-container {
+      overflow-x: auto;
+      overflow-y: visible;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
 
-        tr:last-child td {
-            border-bottom: none;
-        }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.95rem;
+    }
 
-        .btn-delete-row {
-            background: transparent;
-            color: #ef4444;
-            padding: 4px 8px;
-        }
-        .btn-delete-row:hover { background: #ffeeef; border-radius: 4px;}
+    th, td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: top;
+      word-break: break-word;
+    }
 
-        /* PDF Header */
-        .pdf-header {
-            display: none;
-            margin-bottom: 25px;
-            border-bottom: 3px solid var(--primary);
-            padding-bottom: 10px;
-        }
-    </style>
+    th {
+      background: #f8fafc;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    .btn-delete-row {
+      background: transparent;
+      color: #ef4444;
+      padding: 4px 8px;
+    }
+
+    .btn-delete-row:hover {
+      background: #ffeeef;
+      border-radius: 4px;
+    }
+
+    /* PDF Header */
+    .pdf-header {
+      display: none;
+      margin-bottom: 25px;
+      border-bottom: 3px solid var(--primary);
+      padding-bottom: 10px;
+    }
+
+    /* WICHTIG für PDF-Export */
+    #printArea {
+      background: #fff;
+      padding-bottom: 20mm; /* verhindert abgeschnittene letzte Zeile */
+    }
+
+    #printArea table,
+    #printArea thead,
+    #printArea tbody,
+    #printArea tr,
+    #printArea td,
+    #printArea th {
+      page-break-inside: avoid !important;
+      break-inside: avoid !important;
+    }
+
+    #emptyMessage {
+      text-align: center;
+      color: #94a3b8;
+      padding: 20px;
+    }
+  </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Eigene Tabellen-Sammlung</h1>
-    <p class="subtitle">Definiere deine Spaltenstruktur völlig flexibel, pflege deine Daten tabellarisch und exportiere das Ergebnis.</p>
+  <h1>Eigene Tabellen-Sammlung</h1>
+  <p class="subtitle">
+    Definiere deine Spaltenstruktur völlig flexibel, pflege deine Daten tabellarisch und exportiere das Ergebnis.
+  </p>
 
-    <section>
-        <h3>1. Spaltenstruktur definieren (Namen editierbar)</h3>
-        <div class="columns-config">
-            <div id="columnsList" class="columns-config">
-                </div>
-            <button class="btn-secondary" onclick="addColumn()">➕ Weitere Unterthema-Spalte</button>
-        </div>
-    </section>
+  <section>
+    <h3>1. Spaltenstruktur definieren (Namen editierbar)</h3>
+    <div class="columns-config">
+      <div id="columnsList" class="columns-config"></div>
+      <button class="btn-secondary" onclick="addColumn()">➕ Weitere Unterthema-Spalte</button>
+    </div>
+  </section>
 
-    <section>
-        <h3>2. Eintrag hinzufügen</h3>
-        <div id="dynamicForm" class="dynamic-form">
-            </div>
-        <div style="display: flex; justify-content: flex-end;">
-            <button class="btn-accent" onclick="addRow()">📥 Zeile hinzufügen</button>
-        </div>
-    </section>
+  <section>
+    <h3>2. Eintrag hinzufügen</h3>
+    <div id="dynamicForm" class="dynamic-form"></div>
+    <div style="display: flex; justify-content: flex-end;">
+      <button class="btn-accent" onclick="addRow()">📥 Zeile hinzufügen</button>
+    </div>
+  </section>
 
-    <div class="export-actions" id="actionFields" style="display: none;">
-        <button class="btn-excel" onclick="exportToExcel()">📊 Excel Export (.xlsx)</button>
-        <button class="btn-pdf" onclick="exportToPDF()">📄 PDF Export (.pdf)</button>
+  <div class="export-actions" id="actionFields" style="display: none;">
+    <button class="btn-excel" onclick="exportToExcel()">📊 Excel Export (.xlsx)</button>
+    <button class="btn-pdf" onclick="exportToPDF()">📄 PDF Export (.pdf)</button>
+  </div>
+
+  <div id="printArea">
+    <div class="pdf-header" id="pdfHeader">
+      <h2>Themen- & Datensammlung</h2>
+      <p>Export-Datum: <span id="pdfDate"></span></p>
     </div>
 
-    <div id="printArea">
-        <div class="pdf-header" id="pdfHeader">
-            <h2>Themen- & Datensammlung</h2>
-            <p>Export-Datum: <span id="pdfDate"></span></p>
-        </div>
-        
-        <div class="table-container" id="tableContainer" style="display: none;">
-            <table id="dataTable">
-                <thead>
-                    <tr id="tableHeaderRow">
-                        </tr>
-                </thead>
-                <tbody id="tableBody">
-                    </tbody>
-            </table>
-        </div>
-        <div id="emptyMessage" style="text-align: center; color: #94a3b8; padding: 20px;">
-            Noch keine Daten in der Sammlung erfasst.
-        </div>
+    <div class="table-container" id="tableContainer" style="display: none;">
+      <table id="dataTable">
+        <thead>
+          <tr id="tableHeaderRow"></tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
     </div>
+
+    <div id="emptyMessage">
+      Noch keine Daten in der Sammlung erfasst.
+    </div>
+  </div>
 </div>
 
 <script>
-    // Standard-Spaltenvorgabe beim Laden
-    let columns = ["Hauptthema", "Unterthema 1", "Unterthema 2", "Unterthema 3"];
-    let dataRows = [];
+  // Standard-Spaltenvorgabe beim Laden
+  let columns = ["Hauptthema", "Unterthema 1", "Unterthema 2", "Unterthema 3"];
+  let dataRows = [];
 
-    // Initialisierung beim Start
-    window.onload = function() {
-        renderColumnsConfig();
+  // Initialisierung beim Start
+  window.onload = function () {
+    renderColumnsConfig();
+    renderInputFields();
+    renderTable();
+  };
+
+  // Rendert die Spalten-Badges zum Benennen und Löschen
+  function renderColumnsConfig() {
+    const container = document.getElementById('columnsList');
+    container.innerHTML = '';
+
+    columns.forEach((colName, index) => {
+      const badge = document.createElement('div');
+      badge.className = 'column-badge';
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.value = colName;
+
+      input.oninput = (e) => {
+        columns[index] = e.target.value.trim() || `Spalte ${index + 1}`;
         renderInputFields();
+        renderTable();
+      };
+
+      badge.appendChild(input);
+
+      // Hauptthema darf nicht gelöscht werden
+      if (index > 0) {
+        const removeBtn = document.createElement('button');
+        removeBtn.className = 'btn-remove-col';
+        removeBtn.innerText = '✕';
+        removeBtn.title = 'Spalte löschen';
+        removeBtn.onclick = () => removeColumn(index);
+        badge.appendChild(removeBtn);
+      }
+
+      container.appendChild(badge);
+    });
+  }
+
+  // Erzeugt die Eingabefelder basierend auf den aktuellen Spaltennamen
+  function renderInputFields() {
+    const form = document.getElementById('dynamicForm');
+
+    // Werte der vorhandenen Inputs merken
+    const currentValues = {};
+    columns.forEach((_, idx) => {
+      const existingInput = document.getElementById(`input_col_${idx}`);
+      if (existingInput) {
+        currentValues[idx] = existingInput.value;
+      }
+    });
+
+    form.innerHTML = '';
+
+    columns.forEach((colName, index) => {
+      const group = document.createElement('div');
+      group.className = 'form-group';
+
+      const label = document.createElement('label');
+      label.innerText = colName + ":";
+
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.id = `input_col_${index}`;
+      input.placeholder = `Eingabe für ${colName}`;
+      if (typeof currentValues[index] !== 'undefined') {
+        input.value = currentValues[index];
+      }
+
+      group.appendChild(label);
+      group.appendChild(input);
+      form.appendChild(group);
+    });
+  }
+
+  // Neue Spalte hinzufügen
+  function addColumn() {
+    const newIndex = columns.length;
+    columns.push(`Unterthema ${newIndex}`);
+
+    // Bestehende Zeilen erweitern
+    dataRows.forEach(row => row.push(''));
+
+    renderColumnsConfig();
+    renderInputFields();
+    renderTable();
+  }
+
+  // Spalte löschen
+  function removeColumn(index) {
+    if (index === 0) return;
+
+    columns.splice(index, 1);
+
+    // Daten in allen Zeilen an dieser Position entfernen
+    dataRows.forEach(row => row.splice(index, 1));
+
+    renderColumnsConfig();
+    renderInputFields();
+    renderTable();
+  }
+
+  // Zeile zur Tabelle hinzufügen
+  function addRow() {
+    const newRow = [];
+    let hasContent = false;
+
+    columns.forEach((_, index) => {
+      const input = document.getElementById(`input_col_${index}`);
+      const val = input ? input.value.trim() : '';
+      if (val !== '') hasContent = true;
+      newRow.push(val || '-');
+    });
+
+    if (!hasContent) {
+      alert("Bitte fülle mindestens ein Feld aus, um einen Eintrag hinzuzufügen!");
+      return;
+    }
+
+    dataRows.push(newRow);
+
+    // Eingabefelder leeren, Hauptthema optional stehen lassen
+    columns.forEach((_, index) => {
+      if (index > 0) {
+        const input = document.getElementById(`input_col_${index}`);
+        if (input) input.value = '';
+      }
+    });
+
+    renderTable();
+  }
+
+  // Zeile löschen
+  function deleteRow(rowIndex) {
+    dataRows.splice(rowIndex, 1);
+    renderTable();
+  }
+
+  // Tabelle neu zeichnen
+  function renderTable() {
+    const tableContainer = document.getElementById('tableContainer');
+    const emptyMessage = document.getElementById('emptyMessage');
+    const actionFields = document.getElementById('actionFields');
+    const headerRow = document.getElementById('tableHeaderRow');
+    const tbody = document.getElementById('tableBody');
+
+    // Header leeren
+    headerRow.innerHTML = '';
+
+    // Header neu aufbauen
+    columns.forEach(colName => {
+      const th = document.createElement('th');
+      th.innerText = colName;
+      headerRow.appendChild(th);
+    });
+
+    // Extra-Spalte für Aktionen
+    const thAction = document.createElement('th');
+    thAction.className = 'action-col';
+    thAction.innerText = 'Aktion';
+    headerRow.appendChild(thAction);
+
+    // Body leeren
+    tbody.innerHTML = '';
+
+    if (dataRows.length === 0) {
+      tableContainer.style.display = 'none';
+      actionFields.style.display = 'none';
+      emptyMessage.style.display = 'block';
+      return;
+    }
+
+    tableContainer.style.display = 'block';
+    actionFields.style.display = 'flex';
+    emptyMessage.style.display = 'none';
+
+    dataRows.forEach((row, rowIndex) => {
+      const tr = document.createElement('tr');
+
+      row.forEach(cellValue => {
+        const td = document.createElement('td');
+        td.innerText = cellValue;
+        tr.appendChild(td);
+      });
+
+      const tdAction = document.createElement('td');
+      tdAction.className = 'action-col';
+      tdAction.innerHTML = `<button class="btn-delete-row" onclick="deleteRow(${rowIndex})">Löschen</button>`;
+      tr.appendChild(tdAction);
+
+      tbody.appendChild(tr);
+    });
+  }
+
+  // ==================== EXPORT SYSTEM ====================
+
+  function exportToExcel() {
+    const worksheetData = [[...columns]];
+    dataRows.forEach(row => worksheetData.push([...row]));
+
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(worksheetData);
+
+    // Automatische Spaltenbreiten
+    ws['!cols'] = columns.map((_, colIdx) => {
+      const maxLen = Math.max(
+        ...worksheetData.map(row => {
+          const cell = row[colIdx];
+          return cell ? cell.toString().length : 0;
+        })
+      );
+      return { wch: Math.max(maxLen + 4, 12) };
+    });
+
+    XLSX.utils.book_append_sheet(wb, ws, "Sammlung");
+    XLSX.writeFile(wb, "Themen_Tabelle.xlsx");
+  }
+
+  function exportToPDF() {
+    if (dataRows.length === 0) {
+      alert("Es sind keine Daten für den PDF-Export vorhanden.");
+      return;
+    }
+
+    const element = document.getElementById('printArea');
+    const header = document.getElementById('pdfHeader');
+    const dateSpan = document.getElementById('pdfDate');
+
+    // Aktionsspalten vor PDF ausblenden
+    const actionElements = document.querySelectorAll('.action-col');
+    actionElements.forEach(el => {
+      el.style.display = 'none';
+    });
+
+    header.style.display = 'block';
+    dateSpan.innerText = new Date().toLocaleDateString('de-DE');
+
+    const opt = {
+      margin: [10, 10, 18, 10], // oben, links, unten, rechts
+      filename: 'Themen_Sammlung_Tabelle.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: {
+        scale: 2,
+        useCORS: true,
+        scrollY: 0
+      },
+      pagebreak: {
+        mode: ['css', 'legacy']
+      },
+      jsPDF: {
+        unit: 'mm',
+        format: 'a4',
+        orientation: 'landscape'
+      }
     };
 
-    // Rendert die Spalten-Badges zum Benennen und Löschen
-    function renderColumnsConfig() {
-        const container = document.getElementById('columnsList');
-        container.innerHTML = '';
+    html2pdf()
+      .set(opt)
+      .from(element)
+      .save()
+      .then(() => {
+        resetAfterPDFExport();
+      })
+      .catch((err) => {
+        console.error('PDF-Export fehlgeschlagen:', err);
+        resetAfterPDFExport();
+        alert("Der PDF-Export konnte nicht abgeschlossen werden.");
+      });
 
-        columns.forEach((colName, index) => {
-            const badge = document.createElement('div');
-            badge.className = 'column-badge';
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.value = colName;
-            // Verhindert das Leeren und speichert Namensänderungen live ab
-            input.oninput = (e) => {
-                columns[index] = e.target.value || `Spalte ${index + 1}`;
-                renderInputFields();
-                renderTable();
-            };
-            
-            badge.appendChild(input);
-
-            // Hauptthema darf nicht gelöscht werden, um Konsistenz zu wahren
-            if (index > 0) {
-                const removeBtn = document.createElement('button');
-                removeBtn.className = 'btn-remove-col';
-                removeBtn.innerText = '✕';
-                removeBtn.onclick = () => removeColumn(index);
-                badge.appendChild(removeBtn);
-            }
-
-            container.appendChild(badge);
-        });
+    function resetAfterPDFExport() {
+      header.style.display = 'none';
+      actionElements.forEach(el => {
+        el.style.display = '';
+      });
     }
-
-    // Erzeugt die Eingabefelder basierend auf den aktuellen Spaltennamen
-    function renderInputFields() {
-        const form = document.getElementById('dynamicForm');
-        // Aktuelle Werte sichern, um sie bei Spaltenänderungen nicht zu löschen
-        const currentValues = {};
-        columns.forEach((_, idx) => {
-            const existingInput = document.getElementById(`input_col_${idx}`);
-            if (existingInput) currentValues[idx] = existingInput.value;
-        });
-
-        form.innerHTML = '';
-
-        columns.forEach((colName, index) => {
-            const group = document.createElement('div');
-            group.className = 'form-group';
-
-            const label = document.createElement('label');
-            label.innerText = colName + ":";
-            
-            const input = document.createElement('input');
-            input.type = 'text';
-            input.id = `input_col_${index}`;
-            input.placeholder = `Eingabe für ${colName}`;
-            if (currentValues[index]) input.value = currentValues[index];
-
-            group.appendChild(label);
-            group.appendChild(input);
-            form.appendChild(group);
-        });
-    }
-
-    // Neue Spalte hinzufügen
-    function addColumn() {
-        const newIndex = columns.length;
-        columns.push(`Unterthema ${newIndex}`);
-        
-        // Bestehende Zeilen um ein leeres Feld erweitern
-        dataRows.forEach(row => row.push(''));
-
-        renderColumnsConfig();
-        renderInputFields();
-        renderTable();
-    }
-
-    // Spalte löschen
-    function removeColumn(index) {
-        if (index === 0) return;
-        columns.splice(index, 1);
-        
-        // Daten aus allen Zeilen an dieser Position entfernen
-        dataRows.forEach(row => row.splice(index, 1));
-
-        renderColumnsConfig();
-        renderInputFields();
-        renderTable();
-    }
-
-    // Zeile zur Tabelle hinzufügen
-    function addRow() {
-        const newRow = [];
-        let hasContent = false;
-
-        columns.forEach((_, index) => {
-            const val = document.getElementById(`input_col_${index}`).value.trim();
-            if (val !== "") hasContent = true;
-            newRow.push(val || '-');
-        });
-
-        // Validierung: Es muss mindestens irgendetwas eingetragen sein
-        if (!hasContent) {
-            alert("Bitte fülle mindestens ein Feld aus, um einen Eintrag hinzuzufügen!");
-            return;
-        }
-
-        dataRows.push(newRow);
-        
-        // Eingabefelder leeren (Hauptthema bleibt optional stehen für schnelles Arbeiten)
-        columns.forEach((_, index) => {
-            if (index > 0) document.getElementById(`input_col_${index}`).value = '';
-        });
-
-        renderTable();
-    }
-
-    // Zeile löschen
-    function deleteRow(rowIndex) {
-        dataRows.splice(rowIndex, 1);
-        renderTable();
-    }
-
-    // Tabelle neu zeichnen
-    function renderTable() {
-        const tableContainer = document.getElementById('tableContainer');
-        const emptyMessage = document.getElementById('emptyMessage');
-        const actionFields = document.getElementById('actionFields');
-        const headerRow = document.getElementById('tableHeaderRow');
-        const tbody = document.getElementById('tableBody');
-
-        // Header leeren & neu aufbauen
-        headerRow.innerHTML = '';
-        columns.forEach(colName => {
-            const th = document.createElement('th');
-            th.innerText = colName;
-            headerRow.appendChild(th);
-        });
-        // Extra Spalte für Aktionen (Löschen)
-        const thAction = document.createElement('th');
-        thAction.className = 'action-col';
-        thAction.innerText = 'Aktion';
-        headerRow.appendChild(thAction);
-
-        // Body leeren & neu aufbauen
-        tbody.innerHTML = '';
-        
-        if (dataRows.length === 0) {
-            tableContainer.style.display = 'none';
-            actionFields.style.display = 'none';
-            emptyMessage.style.display = 'block';
-            return;
-        }
-
-        tableContainer.style.display = 'block';
-        actionFields.style.display = 'flex';
-        emptyMessage.style.display = 'none';
-
-        dataRows.forEach((row, rowIndex) => {
-            const tr = document.createElement('tr');
-            
-            row.forEach(cellValue => {
-                const td = document.createElement('td');
-                td.innerText = cellValue;
-                tr.appendChild(td);
-            });
-
-            // Löschen-Button für jede Zeile
-            const tdAction = document.createElement('td');
-            tdAction.className = 'action-col';
-            tdAction.innerHTML = `<button class="btn-delete-row" onclick="deleteRow(${rowIndex})">Löschen</button>`;
-            tr.appendChild(tdAction);
-
-            tbody.appendChild(tr);
-        });
-    }
-
-    // ==================== EXPORT SYSTEM ====================
-
-    function exportToExcel() {
-        // Daten-Array für Excel zusammensetzen (Header + Zeilen)
-        const worksheetData = [ [...columns] ]; // Kopie der Header-Zeile
-        dataRows.forEach(row => worksheetData.push([...row]));
-
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(worksheetData);
-
-        // Automatische Spaltenbreitenberechnung für perfekten Excel-Look
-        ws['!cols'] = columns.map((_, colIdx) => {
-            const maxLen = Math.max(...worksheetData.map(row => row[colIdx] ? row[colIdx].toString().length : 0));
-            return { wch: Math.max(maxLen + 4, 12) };
-        });
-
-        XLSX.utils.book_append_sheet(wb, ws, "Sammlung");
-        XLSX.writeFile(wb, "Themen_Tabelle.xlsx");
-    }
-
-    function exportToPDF() {
-        const element = document.getElementById('printArea');
-        const header = document.getElementById('pdfHeader');
-        const dateSpan = document.getElementById('pdfDate');
-        
-        // Aktion-Spalten (Buttons) vor dem PDF-Druck unsichtbar machen
-        const actionElements = document.querySelectorAll('.action-col');
-        actionElements.forEach(el => el.style.display = 'none');
-
-        header.style.display = 'block';
-        dateSpan.innerText = new Date().toLocaleDateString('de-DE');
-
-        const opt = {
-            margin:       10,
-            filename:     'Themen_Sammlung_Tabelle.pdf',
-            image:        { type: 'jpeg', quality: 0.98 },
-            html2canvas:  { scale: 2, useCORS: true },
-            jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' } // Querformat eignet sich besser für Tabellen
-        };
-
-        html2pdf().set(opt).from(element).save().then(() => {
-            // Nach dem Export UI wieder in den Normalzustand versetzen
-            header.style.display = 'none';
-            actionElements.forEach(el => el.style.display = '');
-        });
-    }
+  }
 </script>
 
 </body>
