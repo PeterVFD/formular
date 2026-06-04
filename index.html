@@ -1,14 +1,15 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <script>
+  <script>
     window.PROTECTED_HUB_URL = "https://petervfd.github.io/haupt/";
   </script>
   <script src="schutz.js"></script>
-    
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Sammlungen per Formular</title>
+
   <style>
     * { box-sizing: border-box; }
 
@@ -20,7 +21,7 @@
     }
 
     .wrap {
-      max-width: 1100px;
+      max-width: 1350px;
       margin: 24px auto;
       padding: 16px;
     }
@@ -92,6 +93,7 @@
       font-size: 14px;
       cursor: pointer;
       transition: 0.2s;
+      white-space: nowrap;
     }
 
     .btn-primary {
@@ -130,6 +132,15 @@
       background: #a4262c;
     }
 
+    .btn-export {
+      background: #5c2d91;
+      color: #fff;
+    }
+
+    .btn-export:hover {
+      background: #44206d;
+    }
+
     .toolbar {
       display: grid;
       grid-template-columns: 1fr auto;
@@ -137,42 +148,11 @@
       align-items: end;
     }
 
-    .entry {
-      border: 1px solid #dde4ea;
-      border-radius: 12px;
-      padding: 14px;
-      background: #fbfcfd;
-      margin-bottom: 12px;
-    }
-
-    .entry-head {
+    .toolbar-right {
       display: flex;
-      justify-content: space-between;
-      align-items: start;
-      gap: 12px;
+      gap: 10px;
       flex-wrap: wrap;
-      margin-bottom: 10px;
-    }
-
-    .entry-title {
-      font-size: 18px;
-      font-weight: bold;
-      margin-bottom: 4px;
-    }
-
-    .meta {
-      font-size: 12px;
-      color: #666;
-      line-height: 1.5;
-    }
-
-    .content-box {
-      white-space: pre-wrap;
-      background: #fff;
-      border: 1px solid #e3e8ee;
-      border-radius: 10px;
-      padding: 12px;
-      margin: 10px 0 12px;
+      justify-content: flex-end;
     }
 
     .small {
@@ -181,17 +161,71 @@
       margin-top: 8px;
     }
 
+    .status {
+      margin-top: 10px;
+      font-size: 13px;
+      color: #0b5d0b;
+      font-weight: bold;
+    }
+
     .empty {
       color: #666;
       font-style: italic;
       padding: 8px 0;
     }
 
-    .status {
-      margin-top: 10px;
+    .table-wrap {
+      margin-top: 14px;
+      overflow-x: auto;
+      border: 1px solid #dde4ea;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1200px;
+    }
+
+    thead {
+      background: #f5f7fa;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e6ebf0;
+      text-align: left;
+      vertical-align: top;
+      padding: 10px 12px;
+      font-size: 14px;
+    }
+
+    th {
       font-size: 13px;
-      color: #0b5d0b;
       font-weight: bold;
+      color: #333;
+    }
+
+    tbody tr:hover {
+      background: #fafbfd;
+    }
+
+    .cell-content {
+      white-space: pre-wrap;
+      max-width: 360px;
+      word-break: break-word;
+    }
+
+    .cell-small {
+      font-size: 13px;
+      color: #555;
+    }
+
+    .row-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      min-width: 145px;
     }
 
     .badge {
@@ -202,13 +236,16 @@
       padding: 4px 10px;
       font-size: 12px;
       font-weight: bold;
-      margin-bottom: 6px;
     }
 
-    @media (max-width: 800px) {
+    @media (max-width: 950px) {
       .grid-2,
       .toolbar {
         grid-template-columns: 1fr;
+      }
+
+      .toolbar-right {
+        justify-content: flex-start;
       }
     }
   </style>
@@ -266,9 +303,17 @@
       <div class="toolbar">
         <div>
           <label for="search">Suche</label>
-          <input type="text" id="search" placeholder="Nach Sammlung, Betreff oder Inhalt suchen..." oninput="renderEntries()" />
+          <input
+            type="text"
+            id="search"
+            placeholder="Nach Sammlung, Betreff oder Inhalt suchen..."
+            oninput="renderEntries()"
+          />
         </div>
-        <div>
+
+        <div class="toolbar-right">
+          <button class="btn-export" onclick="exportCSV()">Export CSV</button>
+          <button class="btn-export" onclick="exportExcel()">Export Excel</button>
           <button class="btn-secondary" onclick="clearAll()">Alle Sammlungen löschen</button>
         </div>
       </div>
@@ -293,6 +338,7 @@
     function loadStorage() {
       const raw = sessionStorage.getItem(STORAGE_KEY);
       if (!raw) return;
+
       try {
         entries = JSON.parse(raw) || [];
       } catch (e) {
@@ -304,9 +350,12 @@
       const el = document.getElementById("status");
       el.textContent = text;
       el.style.color = color;
+
       setTimeout(() => {
-        if (el.textContent === text) el.textContent = "";
-      }, 2500);
+        if (el.textContent === text) {
+          el.textContent = "";
+        }
+      }, 3000);
     }
 
     function getFormData() {
@@ -390,21 +439,28 @@
       editId = id;
       document.getElementById("formTitle").textContent = "Sammlung bearbeiten";
       document.getElementById("saveBtn").textContent = "Änderungen speichern";
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
     function deleteEntry(id) {
       if (!confirm("Diese Sammlung wirklich löschen?")) return;
+
       entries = entries.filter(e => e.id !== id);
       saveStorage();
       renderEntries();
-      if (editId === id) clearForm();
+
+      if (editId === id) {
+        clearForm();
+      }
+
       showStatus("Sammlung wurde gelöscht.", "#a4262c");
     }
 
     function clearAll() {
       if (!entries.length) return;
       if (!confirm("Wirklich alle Sammlungen löschen?")) return;
+
       entries = [];
       saveStorage();
       renderEntries();
@@ -419,6 +475,7 @@
       const to = entry.empfaenger || "";
       const cc = entry.cc || "";
       const subject = entry.betreff || "";
+
       const body =
         "Sammlung: " + (entry.sammlung || "") + "\n" +
         "Erfasst am: " + (entry.createdAt || "") + "\n" +
@@ -438,7 +495,7 @@
     }
 
     function escapeHtml(str) {
-      return (str || "")
+      return String(str || "")
         .replace(/&/g, "&amp;")
         .replace(/</g, "&lt;")
         .replace(/>/g, "&gt;")
@@ -446,50 +503,184 @@
         .replace(/'/g, "&#039;");
     }
 
-    function renderEntries() {
-      const list = document.getElementById("list");
+    function getFilteredEntries() {
       const search = document.getElementById("search").value.trim().toLowerCase();
 
-      let filtered = entries.filter(e => {
+      return entries.filter(e => {
         const text = [
           e.sammlung,
           e.betreff,
           e.empfaenger,
           e.cc,
-          e.inhalt
+          e.inhalt,
+          e.createdAt,
+          e.updatedAt
         ].join(" ").toLowerCase();
+
         return text.includes(search);
       });
+    }
+
+    function csvValue(value) {
+      const v = String(value || "").replace(/\r?\n/g, " ");
+      return '"' + v.replace(/"/g, '""') + '"';
+    }
+
+    function downloadFile(content, filename, mimeType) {
+      const blob = new Blob([content], { type: mimeType });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function getExportRows() {
+      return getFilteredEntries().map(entry => ({
+        Sammlung: entry.sammlung || "",
+        Betreff: entry.betreff || "",
+        Empfaenger: entry.empfaenger || "",
+        CC: entry.cc || "",
+        Erfasst: entry.createdAt || "",
+        Geaendert: entry.updatedAt || "",
+        Inhalt: entry.inhalt || ""
+      }));
+    }
+
+    function exportCSV() {
+      const rows = getExportRows();
+
+      if (!rows.length) {
+        alert("Keine Daten zum Export vorhanden.");
+        return;
+      }
+
+      const headers = ["Sammlung", "Betreff", "Empfaenger", "CC", "Erfasst", "Geaendert", "Inhalt"];
+      const lines = [];
+      lines.push(headers.map(csvValue).join(";"));
+
+      rows.forEach(row => {
+        lines.push([
+          csvValue(row.Sammlung),
+          csvValue(row.Betreff),
+          csvValue(row.Empfaenger),
+          csvValue(row.CC),
+          csvValue(row.Erfasst),
+          csvValue(row.Geaendert),
+          csvValue(row.Inhalt)
+        ].join(";"));
+      });
+
+      const csvContent = "\uFEFF" + lines.join("\n");
+      const dateiName = "sammlungen_export.csv";
+      downloadFile(csvContent, dateiName, "text/csv;charset=utf-8;");
+      showStatus("CSV-Export wurde erstellt.");
+    }
+
+    function exportExcel() {
+      const rows = getExportRows();
+
+      if (!rows.length) {
+        alert("Keine Daten zum Export vorhanden.");
+        return;
+      }
+
+      let tableRows = rows.map(row => `
+        <tr>
+          <td>${escapeHtml(row.Sammlung)}</td>
+          <td>${escapeHtml(row.Betreff)}</td>
+          <td>${escapeHtml(row.Empfaenger)}</td>
+          <td>${escapeHtml(row.CC)}</td>
+          <td>${escapeHtml(row.Erfasst)}</td>
+          <td>${escapeHtml(row.Geaendert)}</td>
+          <td>${escapeHtml(row.Inhalt)}</td>
+        </tr>
+      `).join("");
+
+      const excelHtml =
+        '<html xmlns:o="urn:schemas-microsoft-com:office:office" ' +
+        'xmlns:x="urn:schemas-microsoft-com:office:excel" ' +
+        'xmlns="http://www.w3.org/TR/REC-html40">' +
+        '<head>' +
+        '<meta charset="UTF-8">' +
+        '<!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Sammlungen</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]-->' +
+        '<style>' +
+        'table{border-collapse:collapse;font-family:Arial,sans-serif;font-size:12pt;}' +
+        'th,td{border:1px solid #999;padding:8px;vertical-align:top;text-align:left;}' +
+        'th{background:#d9eaf7;font-weight:bold;}' +
+        'td{white-space:pre-wrap;}' +
+        '</style>' +
+        '</head><body>' +
+        '<table>' +
+        '<thead><tr>' +
+        '<th>Sammlung</th>' +
+        '<th>Betreff</th>' +
+        '<th>Empfänger</th>' +
+        '<th>CC</th>' +
+        '<th>Erfasst</th>' +
+        '<th>Geändert</th>' +
+        '<th>Inhalt</th>' +
+        '</tr></thead>' +
+        '<tbody>' + tableRows + '</tbody>' +
+        '</table>' +
+        '</body></html>';
+
+      downloadFile(excelHtml, "sammlungen_export.xls", "application/vnd.ms-excel");
+      showStatus("Excel-Export wurde erstellt.");
+    }
+
+    function renderEntries() {
+      const list = document.getElementById("list");
+      const filtered = getFilteredEntries();
 
       if (!filtered.length) {
         list.innerHTML = '<div class="empty">Keine Sammlungen vorhanden.</div>';
         return;
       }
 
-      list.innerHTML = filtered.map(entry => `
-        <div class="entry">
-          <div class="entry-head">
-            <div>
-              <div class="badge">${escapeHtml(entry.sammlung)}</div>
-              <div class="entry-title">${escapeHtml(entry.betreff)}</div>
-              <div class="meta">
-                Empfänger: ${escapeHtml(entry.empfaenger || "-")}<br>
-                CC: ${escapeHtml(entry.cc || "-")}<br>
-                Erfasst: ${escapeHtml(entry.createdAt || "-")}
-                ${entry.updatedAt ? "<br>Zuletzt geändert: " + escapeHtml(entry.updatedAt) : ""}
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="btn-send" onclick="sendEntry('${entry.id}')">Separat versenden</button>
-              <button class="btn-secondary" onclick="editEntry('${entry.id}')">Bearbeiten</button>
-              <button class="btn-danger" onclick="deleteEntry('${entry.id}')">Löschen</button>
-            </div>
-          </div>
-
-          <div class="content-box">${escapeHtml(entry.inhalt)}</div>
+      list.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Sammlung</th>
+                <th>Betreff</th>
+                <th>Empfänger</th>
+                <th>CC</th>
+                <th>Erfasst</th>
+                <th>Geändert</th>
+                <th>Inhalt</th>
+                <th>Aktionen</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${filtered.map(entry => `
+                <tr>
+                  <td><span class="badge">${escapeHtml(entry.sammlung || "-")}</span></td>
+                  <td>${escapeHtml(entry.betreff || "-")}</td>
+                  <td class="cell-small">${escapeHtml(entry.empfaenger || "-")}</td>
+                  <td class="cell-small">${escapeHtml(entry.cc || "-")}</td>
+                  <td class="cell-small">${escapeHtml(entry.createdAt || "-")}</td>
+                  <td class="cell-small">${escapeHtml(entry.updatedAt || "-")}</td>
+                  <td><div class="cell-content">${escapeHtml(entry.inhalt || "-")}</div></td>
+                  <td>
+                    <div class="row-actions">
+                      <button class="btn-send" onclick="sendEntry('${entry.id}')">Separat versenden</button>
+                      <button class="btn-secondary" onclick="editEntry('${entry.id}')">Bearbeiten</button>
+                      <button class="btn-danger" onclick="deleteEntry('${entry.id}')">Löschen</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
         </div>
-      `).join("");
+      `;
     }
 
     loadStorage();
